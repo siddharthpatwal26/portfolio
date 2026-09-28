@@ -82,7 +82,8 @@ function initTypingEffect() {
         "Power BI & Excel Dashboards",
         "SQL Querying & Data Modeling",
         "Python (Pandas, NumPy, Seaborn)",
-        "Machine Learning & AI (Watsonx)"
+        "Machine Learning & AI (Watsonx)",
+        "Python APIs (FastAPI, Flask)"
     ];
     
     const typingText = document.getElementById('typingText');
@@ -369,8 +370,65 @@ function showToast(message) {
     }
 }
 
-function handleFormSubmit(e) {
+/* Contact form: messages are emailed to Siddharth.
+   1. Get a free access key at https://web3forms.com (enter sidpatwal26@gmail.com).
+   2. Paste it below. Until then the form falls back to opening the visitor's email app. */
+const WEB3FORMS_KEY = '0d53a388-8f64-418c-8ba7-28e0cf2efb75';
+const CONTACT_EMAIL = 'sidpatwal26@gmail.com';
+
+async function handleFormSubmit(e) {
     e.preventDefault();
-    showToast('Thank you! Your message has been sent successfully.');
-    document.getElementById('contactForm').reset();
+    const form = document.getElementById('contactForm');
+    const btn = form.querySelector('button[type="submit"]');
+    const data = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value
+    };
+
+    if (WEB3FORMS_KEY.startsWith('PASTE_')) {
+        const body = encodeURIComponent('From: ' + data.name + ' (' + data.email + ')\n\n' + data.message);
+        window.location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent(data.subject) + '&body=' + body;
+        showToast('Opening your email app to send the message.');
+        return;
+    }
+
+    btn.disabled = true;
+    try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                access_key: WEB3FORMS_KEY,
+                name: data.name,
+                email: data.email,
+                subject: 'Portfolio message: ' + data.subject,
+                message: data.message
+            })
+        });
+        const out = await res.json();
+        if (!res.ok || !out.success) throw new Error(out.message || 'Request failed');
+        showToast('Thank you! Your message has been sent.');
+        form.reset();
+    } catch (err) {
+        showToast('Could not send. Please email ' + CONTACT_EMAIL + ' directly.');
+    } finally {
+        btn.disabled = false;
+    }
 }
+
+
+/* Track switch: filter projects by focus */
+(function(){
+  const btns=document.querySelectorAll('.track-btn');
+  const roles={all:null,data:'Data analyst',ai:'AI / ML engineer',backend:'Backend developer'};
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    const t=b.dataset.track;
+    btns.forEach(x=>x.classList.toggle('active',x===b));
+    document.querySelectorAll('.project-card[data-track]').forEach(c=>{
+      c.style.display=(t==='all'||c.dataset.track.split(' ').includes(t))?'':'none';
+    });
+    const p=document.getElementById('projects'); if(p&&t!=='all') p.scrollIntoView({behavior:'smooth'});
+  }));
+})();

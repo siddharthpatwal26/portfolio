@@ -1207,3 +1207,13 @@ body {
         gap: 1rem;
     }
 }
+
+.track-switch{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.5rem 0 0}
+.track-btn{font:inherit;font-weight:600;font-size:.9rem;padding:.5rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:transparent;color:inherit;cursor:pointer}
+.track-btn.active{background:#6c8cff;border-color:#6c8cff;color:#0b1020}
+.track-btn:focus-visible{outline:3px solid #f2b138;outline-offset:2px}
+
+.hero-name-row{display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:1rem}
+.hero-name-row .hero-title{margin:0}
+.hero-avatar{width:160px;height:160px;flex:none;margin:0}
+@media (max-width:600px){.hero-avatar{width:120px;height:120px}}
